@@ -1,10 +1,12 @@
 const path = require("path");
+const cors = require("cors");
 
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const multer = require("multer");
 
+const auth  =require('./middleware/auth')
 const graphqlSchema = require("./graphl/schema");
 const graphqlResolver = require("./graphl/resolvers");
 
@@ -36,7 +38,7 @@ const fileFilter = (req, file, cb) => {
 
 // app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
 app.use(bodyParser.json()); // application/json
-// app.use(cors());
+app.use(cors());
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
@@ -56,6 +58,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(auth)
 app.use(
   "/graphql",
   graphqlHTTP({
