@@ -1,16 +1,19 @@
 const path = require("path");
 const cors = require("cors");
+// const fs = require("fs");
 
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const multer = require("multer");
 
-const auth  =require('./middleware/auth')
-const graphqlSchema = require("./graphl/schema");
-const graphqlResolver = require("./graphl/resolvers");
+const auth = require("./middleware/auth");
+const graphqlSchema = require("./graphql/schema");
+const graphqlResolver = require("./graphql/resolvers");
 
 const { graphqlHTTP } = require("express-graphql");
+
+const { clearImage } = require("./util/file");
 
 const app = express();
 
@@ -58,7 +61,24 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(auth)
+app.use(auth);
+
+app.put("/post-image", (req, res, next) => {
+  if (!req.file) {
+    return res.status(200).json({ message: "No file provided!" });
+  }
+
+  if (req.file.oldPath) {
+    clearImage(req.file.oldPath);
+  }
+
+  if (req.body.oldPath) {
+    return res
+      .status(201)
+      .json({ message: "file uploaded", filePath: req.file.path });
+  }
+});
+
 app.use(
   "/graphql",
   graphqlHTTP({
