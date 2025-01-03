@@ -64,6 +64,7 @@ app.use((req, res, next) => {
 app.use(auth);
 
 app.put("/post-image", (req, res, next) => {
+
   if (!req.file) {
     return res.status(200).json({ message: "No file provided!" });
   }
@@ -72,11 +73,9 @@ app.put("/post-image", (req, res, next) => {
     clearImage(req.file.oldPath);
   }
 
-  if (req.body.oldPath) {
     return res
       .status(201)
       .json({ message: "file uploaded", filePath: req.file.path });
-  }
 });
 
 app.use(

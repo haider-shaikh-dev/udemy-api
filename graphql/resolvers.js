@@ -65,7 +65,23 @@ module.exports = {
     );
     return { token: token, userId: user._id.toString() };
   },
+  post: async function ({ id }, req) {
+    if (!req.isAuth) {
+      const error = new Error("Not authenticated!");
+      error.code = 401;
+      throw error;
+    }
+    const post = await Post.findById(id).populate('creator');
+
+    return {
+      ...post._doc,
+      _id: post._id.toString(),
+      createdAt: post.createdAt.toString(),
+      updatedAt: post.updatedAt.toString(),
+    };
+  },
   createPost: async function ({ postInput }, req) {
+    console.log("inside createPost");
     if (!req.isAuth) {
       const error = new Error("Not authenticated!");
       error.code = 401;
@@ -90,6 +106,7 @@ module.exports = {
       error.code = 422;
       throw error;
     }
+    console.log('create post1')
     const user = await User.findById(req.userId);
     if (!user) {
       const error = new Error("Invalid user.");
@@ -105,11 +122,13 @@ module.exports = {
     const createdPost = await post.save();
     user.posts.push(createdPost);
     await user.save();
+
+    // return { ...createdUser._doc, _id: createdUser._id.toString() };
     return {
       ...createdPost._doc,
       _id: createdPost._id.toString(),
-      createdAt: createdPost.createdAt.toISOString(),
-      updatedAt: createdPost.updatedAt.toISOString(),
+      createdAt: createdPost.createdAt.toString(),
+      updatedAt: createdPost.updatedAt.toString(),
     };
   },
   posts: async function ({ page }, req) {
@@ -244,7 +263,7 @@ module.exports = {
 
     return { ...user._doc, _id: user._id.toString() };
   },
-  updateStatus: async function ({status}, req) {
+  updateStatus: async function ({ status }, req) {
     if (!req.isAuth) {
       const error = new Error("Not authenticated!");
       error.code = 401;
@@ -260,7 +279,7 @@ module.exports = {
     }
 
     user.status = status;
-    await user.save()
+    await user.save();
 
     return { ...user._doc, _id: user._id.toString() };
   },
