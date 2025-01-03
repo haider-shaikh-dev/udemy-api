@@ -174,7 +174,7 @@ module.exports = {
       throw error;
     }
 
-    if (post.creator._id.toStrin() !== req.userId) {
+    if (post.creator._id.toString() !== req.userId) {
       const error = new Error("Not Authorosed to edit this post!");
       error.code = 403;
       throw error;
